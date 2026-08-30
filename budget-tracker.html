@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Period Tracker</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"Period Tracker","short_name":"Budget","start_url":".","display":"standalone","background_color":"%2314171c","theme_color":"%2314171c","icons":[{"src":"data:image/svg%2Bxml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27%3E%3Crect width=%27192%27 height=%27192%27 fill=%27%2314171c%27/%3E%3Ctext x=%2796%27 y=%27124%27 font-size=%2796%27 font-family=%27sans-serif%27 font-weight=%27700%27 fill=%27%23f0a830%27 text-anchor=%27middle%27%3E%C2%A3%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
+<meta name="theme-color" content="#14171c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--panel:#14171c;--raised:#1b1f26;--line:#2a2f38;--amber:#f0a830;
+  --cyan:#4ec5c1;--red:#e2564a;--text:#e8e6e1;--muted:#868d98}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0 auto;padding:0 14px 60px;max-width:560px;background:var(--panel);
+  color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:15px;line-height:1.45}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-family:'IBM Plex Sans Condensed',sans-serif;text-transform:uppercase;
+  letter-spacing:.14em;font-size:11px;font-weight:600;color:var(--muted)}
+h1{font-family:'IBM Plex Sans Condensed',sans-serif;font-size:19px;letter-spacing:.03em;
+  text-transform:uppercase;margin:0;padding:18px 0 0}
+section{margin-top:18px}
+.card{background:var(--raised);border:1px solid var(--line);border-radius:10px;padding:15px}
+.up{color:var(--cyan)}.down{color:var(--red)}.am{color:var(--amber)}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:14px}
+.nav{display:flex;gap:8px}
+.nav button{background:none;border:1px solid var(--line);color:var(--text);
+  width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer}
+
+.hero{text-align:left}
+.hero .lbl{margin-bottom:4px}
+.hero .fig{font-family:'IBM Plex Mono',monospace;font-size:36px;font-weight:500;line-height:1}
+.hero .sub{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+.line{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.line:last-child{border-bottom:none}
+.line.total{border-top:1px solid var(--line);border-bottom:none;margin-top:4px;padding-top:11px;font-weight:500}
+.line .v{font-family:'IBM Plex Mono',monospace;white-space:nowrap}
+.line .t{min-width:0}
+.line .t small{display:block;font-size:11.5px;color:var(--muted)}
+
+input,select{background:#0e1116;border:1px solid var(--line);color:var(--text);
+  border-radius:8px;padding:11px;width:100%;font-family:inherit;font-size:15px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+.f{margin-bottom:11px}.f .eyebrow{display:block;margin-bottom:5px}
+.btn{background:var(--amber);color:#12151a;border:none;border-radius:8px;padding:12px;
+  font-weight:600;width:100%;cursor:pointer;font-family:inherit;font-size:15px}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--text);font-weight:500}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.hint{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+details{border-top:1px solid var(--line);padding-top:10px;margin-top:14px}
+summary{cursor:pointer;list-style:none;padding:6px 0}
+summary::-webkit-details-marker{display:none}
+summary .eyebrow::after{content:" +"}details[open] summary .eyebrow::after{content:" −"}
+textarea{background:#0e1116;border:1px solid var(--line);color:var(--text);
+  border-radius:8px;padding:10px;width:100%;font-family:inherit;font-size:13px}
+svg{display:block;width:100%;height:120px}
+.tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin-left:6px}
+</style>
+</head>
+<body>
+
+<h1>Period tracker</h1>
+<header>
+  <div>
+    <div class="eyebrow">Pay period</div>
+    <div class="mono" id="periodLabel" style="font-size:14px">—</div>
+  </div>
+  <div class="nav">
+    <button id="prev" aria-label="Previous">‹</button>
+    <button id="next" aria-label="Next">›</button>
+  </div>
+</header>
+
+<section class="card hero">
+  <div class="eyebrow lbl">Running total</div>
+  <div class="fig" id="runFig">£0.00</div>
+  <div class="sub" id="runSub">Ahead or behind, all periods added up.</div>
+</section>
+
+<section>
+  <div class="eyebrow" style="margin-bottom:8px">The plan this period</div>
+  <div class="card" id="planBox"></div>
+</section>
+
+<section>
+  <div class="eyebrow" style="margin-bottom:8px">What actually happened</div>
+  <div class="card" id="actualBox"></div>
+</section>
+
+<section>
+  <div class="eyebrow" style="margin-bottom:8px">Enter this period</div>
+  <div class="card">
+    <div class="f"><span class="eyebrow">Net pay received</span>
+      <input type="number" inputmode="decimal" step="0.01" id="inPay" placeholder="0.00"></div>
+    <div class="f"><span class="eyebrow">Account balance on payday, before pay lands</span>
+      <input type="number" inputmode="decimal" step="0.01" id="inBal" placeholder="0.00"></div>
+    <button class="btn" id="saveBtn">Save period</button>
+  </div>
+</section>
+
+<section id="chartWrap" hidden>
+  <div class="eyebrow" style="margin-bottom:8px">Running total</div>
+  <div class="card"><svg id="chart" viewBox="0 0 340 120" preserveAspectRatio="none"></svg></div>
+</section>
+
+<section>
+  <div class="eyebrow" style="margin-bottom:8px">Set aside</div>
+  <div class="card" id="sinkBox"></div>
+</section>
+
+<section>
+  <details>
+    <summary><span class="eyebrow">Committed outgoings</span></summary>
+    <div class="card" id="regBox" style="margin-top:8px"></div>
+    <div class="card" style="margin-top:8px">
+      <div class="f"><span class="eyebrow">Add a commitment</span>
+        <input id="cName" placeholder="Name, e.g. Anglian Water"></div>
+      <div class="row" style="margin-bottom:11px">
+        <input id="cAmt" type="number" inputmode="decimal" step="0.01" placeholder="Amount">
+        <input id="cDay" type="number" inputmode="numeric" min="1" max="31" placeholder="Day" style="max-width:88px">
+      </div>
+      <div class="row" style="margin-bottom:11px">
+        <select id="cFreq">
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="annual">Annual</option>
+        </select>
+        <select id="cEss">
+          <option value="1">Essential</option>
+          <option value="0">Not essential</option>
+        </select>
+      </div>
+      <button class="btn ghost" id="cAdd">Add</button>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="eyebrow">Settings</span></summary>
+    <div class="card" style="margin-top:8px">
+      <div class="f"><span class="eyebrow">Food per period</span>
+        <input type="number" step="0.01" id="setFood"></div>
+      <div class="f"><span class="eyebrow">Child benefit per month</span>
+        <input type="number" step="0.01" id="setCB"></div>
+      <div class="f"><span class="eyebrow">Lumpy costs per year (car, Christmas, supplements)</span>
+        <input type="number" step="0.01" id="setLumpy"></div>
+      <div class="f"><span class="eyebrow">Starting account balance</span>
+        <input type="number" step="0.01" id="setStart"></div>
+      <button class="btn ghost" id="saveSet">Save settings</button>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="eyebrow">Backup</span></summary>
+    <p class="hint" style="margin-top:8px">Copy somewhere safe. Paste one back to restore.</p>
+    <textarea id="backup" rows="3" spellcheck="false"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button class="btn ghost" id="expBtn">Copy</button>
+      <button class="btn ghost" id="impBtn">Load</button>
+    </div>
+  </details>
+</section>
+
+<script>
+(function(){
+"use strict";
+var KEY="periodtracker:v1", mem=null;
+
+var DEFAULT={
+  anchor:"2026-09-11", cycle:28, payPerYear:13,
+  startBalance:0, foodPerPeriod:0, childBenefitMonthly:0, lumpyPerYear:0,
+  register:[
+  ],
+  periods:{}   // "P-YYYY-MM-DD" -> {pay, balance}
+};
+var D=JSON.parse(JSON.stringify(DEFAULT));
+var viewIdx=0;   // 0 = current period
+
+var gbp=new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'});
+function money(n){return gbp.format(n||0);}
+function signed(n){return (n>0?"+":n<0?"−":"")+gbp.format(Math.abs(n||0));}
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function parse(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function fmt(d){return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});}
+function dOnly(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+
+async function load(){
+  try{var r=localStorage.getItem(KEY); if(r) D=Object.assign(D,JSON.parse(r));}
+  catch(e){ if(mem) D=mem; }
+  if(!D.periods) D.periods={};
+  if(!D.register) D.register=DEFAULT.register;
+}
+async function save(){ mem=D; try{ localStorage.setItem(KEY,JSON.stringify(D)); }catch(e){} }
+
+/* ---- period maths ---- */
+function currentStart(){
+  var a=parse(D.anchor), t=dOnly(new Date());
+  var k=Math.floor((t-a)/86400000/D.cycle);
+  var s=new Date(a); s.setDate(a.getDate()+k*D.cycle);
+  return s;
+}
+function periodStart(offset){
+  var s=currentStart(); s.setDate(s.getDate()+offset*D.cycle); return s;
+}
+function pid(d){ return "P-"+iso(d); }
+
+/* monthly figure -> per period (12 months spread over 13 paydays) */
+function toPeriod(monthly){ return monthly*12/D.payPerYear; }
+
+function monthlyEquiv(item){
+  if(item.f==="quarterly") return item.a*4/12;
+  if(item.f==="annual") return item.a/12;
+  return item.a;
+}
+function committedMonthly(){
+  return D.register.reduce(function(s,i){return s+monthlyEquiv(i);},0);
+}
+function figures(offset){
+  var s=periodStart(offset), e=new Date(s); e.setDate(s.getDate()+D.cycle-1);
+  var id=pid(s), rec=D.periods[id]||{};
+  var committed = toPeriod(committedMonthly());
+  var food = Number(D.foodPerPeriod)||0;
+  var cb = toPeriod(Number(D.childBenefitMonthly)||0);
+  var sink = (Number(D.lumpyPerYear)||0)/D.payPerYear;
+  var pay = rec.pay!=null ? Number(rec.pay) : null;
+  var plannedIn = (pay||0)+cb;
+  var plannedOut = committed+food;
+  var planLeft = plannedIn-plannedOut-sink;
+  return {start:s,end:e,id:id,rec:rec,committed:committed,food:food,cb:cb,sink:sink,
+          pay:pay,plannedIn:plannedIn,plannedOut:plannedOut,planLeft:planLeft};
+}
+
+/* actual: money that left the account = in − (closing − opening) */
+function openingFor(offset){
+  var i=offset-1, guard=0;
+  while(guard++<200){
+    var f=figures(i);
+    if(f.rec.balance!=null) return Number(f.rec.balance);
+    i--;
+    if(i<-60) break;
+  }
+  return Number(D.startBalance)||0;
+}
+function actuals(offset){
+  var f=figures(offset);
+  if(f.rec.balance==null||f.pay==null) return null;
+  var opening=openingFor(offset);
+  var closing=Number(f.rec.balance);
+  var change=closing-opening;
+  var out=f.plannedIn-change;
+  return {opening:opening,closing:closing,change:change,out:out,
+          variance:out-f.plannedOut, leftover:change};
+}
+function runningTotal(){
+  var total=0, count=0;
+  for(var k=-60;k<=1;k++){
+    var a=actuals(k);
+    if(a){ total+=a.leftover; count++; }
+  }
+  return {total:total,count:count};
+}
+
+/* ---- render ---- */
+function render(){
+  var f=figures(viewIdx);
+  $("periodLabel").textContent=fmt(f.start)+" – "+fmt(f.end);
+
+  var rt=runningTotal();
+  $("runFig").textContent=signed(rt.total);
+  $("runFig").className="fig "+(rt.total>=0?"up":"down");
+  $("runSub").textContent = rt.count===0
+    ? "Nothing logged yet. Enter your first period below."
+    : rt.count+(rt.count===1?" period":" periods")+" logged. Average "+signed(rt.total/rt.count)+" per period.";
+
+  /* plan */
+  var p=$("planBox"); p.innerHTML="";
+  function line(box,label,sub,val,cls,tag){
+    var d=document.createElement("div"); d.className="line"+(cls==="total"?" total":"");
+    d.innerHTML='<div class="t">'+esc(label)+(tag?'<span class="tag">'+esc(tag)+'</span>':'')+
+      (sub?'<small>'+esc(sub)+'</small>':'')+'</div>'+
+      '<div class="v '+(cls&&cls!=="total"?cls:'')+'">'+val+'</div>';
+    box.appendChild(d);
+  }
+  line(p,"Net pay",f.pay==null?"not entered yet":"",f.pay==null?"—":money(f.pay),"up");
+  line(p,"Child benefit","£"+(D.childBenefitMonthly)+" a month, spread",money(f.cb),"up");
+  line(p,"Committed outgoings",D.register.length+" items, "+money(committedMonthly())+" a month",("−"+money(f.committed)));
+  line(p,"Food","",("−"+money(f.food)));
+  line(p,"Set aside","£"+D.lumpyPerYear+" a year of lumpy costs",("−"+money(f.sink)));
+  line(p,"Left to live on","after everything above",
+    f.pay==null?"—":money(f.planLeft), f.planLeft>=0?"up":"down","total");
+
+  /* actual */
+  var a=actuals(viewIdx), ab=$("actualBox"); ab.innerHTML="";
+  if(!a){
+    ab.innerHTML='<div class="hint" style="margin:0">Enter your net pay and the account balance on payday and this fills in. Spending is worked out from the balance — no receipts needed.</div>';
+  } else {
+    line(ab,"Opening balance","",money(a.opening));
+    line(ab,"Closing balance","",money(a.closing));
+    line(ab,"Everything that left the account","bills, food, fuel, all of it",("−"+money(a.out)));
+    line(ab,"Against plan",a.variance>0?"more went out than planned":"less went out than planned",
+      signed(-a.variance), a.variance<=0?"up":"down");
+    line(ab,"Leftover this period","change in your balance",
+      signed(a.leftover), a.leftover>=0?"up":"down","total");
+  }
+
+  /* sinking */
+  var sb=$("sinkBox"); sb.innerHTML="";
+  var pot=rt.count*f.sink;
+  line(sb,"Car maintenance, Christmas, supplements","£"+D.lumpyPerYear+" a year",money(f.sink)+" / period");
+  line(sb,"Built up so far",rt.count+" periods",money(pot),"am","total");
+
+  /* register */
+  var rb=$("regBox"); rb.innerHTML="";
+  if(!D.register.length){
+    rb.innerHTML='<div class="hint" style="margin:0">Nothing here yet. Add your standing orders and direct debits below, or paste a backup.</div>';
+  } else {
+    D.register.slice().sort(function(x,y){return monthlyEquiv(y)-monthlyEquiv(x);}).forEach(function(i){
+      var idx=D.register.indexOf(i);
+      var row=document.createElement("div"); row.className="line";
+      var t=document.createElement("div"); t.className="t";
+      t.innerHTML=esc(i.n)+'<small>'+(i.f==="monthly"?"day "+i.d:esc(i.f)+", day "+i.d)+(i.e?"":" \u00b7 not essential")+'</small>';
+      row.appendChild(t);
+      var inp=document.createElement("input");
+      inp.type="number"; inp.step="0.01"; inp.value=i.a;
+      inp.style.maxWidth="96px"; inp.style.padding="7px";
+      inp.setAttribute("aria-label","Amount for "+i.n);
+      inp.onchange=async function(){ D.register[idx].a=Number(inp.value)||0; await save(); render(); };
+      row.appendChild(inp);
+      var x=document.createElement("button");
+      x.className="btn ghost"; x.textContent="\u00d7";
+      x.style.maxWidth="38px"; x.style.padding="7px"; x.style.marginLeft="6px";
+      x.setAttribute("aria-label","Remove "+i.n);
+      x.onclick=async function(){ D.register.splice(idx,1); await save(); render(); };
+      row.appendChild(x);
+      rb.appendChild(row);
+    });
+    line(rb,"Monthly total","across "+D.register.length+" items",money(committedMonthly()),"am","total");
+  }
+
+  /* inputs */
+  $("inPay").value = f.rec.pay!=null?f.rec.pay:"";
+  $("inBal").value = f.rec.balance!=null?f.rec.balance:"";
+  $("setFood").value=D.foodPerPeriod;
+  $("setCB").value=D.childBenefitMonthly;
+  $("setLumpy").value=D.lumpyPerYear;
+  $("setStart").value=D.startBalance;
+
+  drawChart();
+}
+
+function drawChart(){
+  var pts=[],run=0;
+  for(var k=-60;k<=1;k++){
+    var a=actuals(k);
+    if(a){ run+=a.leftover; pts.push(run); }
+  }
+  var w=$("chartWrap");
+  if(pts.length<2){ w.hidden=true; return; }
+  w.hidden=false;
+  var W=340,H=120,P=8;
+  var mn=Math.min.apply(null,pts.concat([0])), mx=Math.max.apply(null,pts.concat([0]));
+  if(mn===mx){mn-=1;mx+=1;}
+  var x=function(i){return P+i*(W-2*P)/(pts.length-1);};
+  var y=function(v){return H-P-((v-mn)/(mx-mn))*(H-2*P);};
+  var d="",c="";
+  pts.forEach(function(v,i){
+    d+=(i?" L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1);
+    c+='<circle cx="'+x(i).toFixed(1)+'" cy="'+y(v).toFixed(1)+'" r="3" fill="var(--amber)"/>';
+  });
+  var z='<line x1="'+P+'" x2="'+(W-P)+'" y1="'+y(0).toFixed(1)+'" y2="'+y(0).toFixed(1)+
+        '" stroke="var(--line)" stroke-width="1"/>';
+  $("chart").innerHTML=z+'<path d="'+d+'" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linejoin="round"/>'+c;
+}
+
+/* ---- actions ---- */
+$("prev").onclick=function(){viewIdx--;render();};
+$("next").onclick=function(){viewIdx++;render();};
+
+$("saveBtn").onclick=async function(){
+  var f=figures(viewIdx);
+  var rec=D.periods[f.id]||{};
+  if($("inPay").value!=="") rec.pay=Number($("inPay").value);
+  if($("inBal").value!=="") rec.balance=Number($("inBal").value);
+  D.periods[f.id]=rec;
+  await save(); render();
+  $("saveBtn").textContent="Saved";
+  setTimeout(function(){$("saveBtn").textContent="Save period";},1400);
+};
+
+$("cAdd").onclick=async function(){
+  var n=$("cName").value.trim(), a=Number($("cAmt").value);
+  if(!n){ $("cName").focus(); return; }
+  if(!a){ $("cAmt").focus(); return; }
+  D.register.push({n:n,a:a,d:Number($("cDay").value)||1,f:$("cFreq").value,e:$("cEss").value==="1"});
+  $("cName").value="";$("cAmt").value="";$("cDay").value="";
+  await save(); render();
+};
+
+$("saveSet").onclick=async function(){
+  D.foodPerPeriod=Number($("setFood").value)||0;
+  D.childBenefitMonthly=Number($("setCB").value)||0;
+  D.lumpyPerYear=Number($("setLumpy").value)||0;
+  D.startBalance=Number($("setStart").value)||0;
+  await save(); render();
+  $("saveSet").textContent="Saved";
+  setTimeout(function(){$("saveSet").textContent="Save settings";},1400);
+};
+
+$("expBtn").onclick=async function(){
+  var s=JSON.stringify(D); $("backup").value=s;
+  try{ await navigator.clipboard.writeText(s); $("expBtn").textContent="Copied"; }
+  catch(e){ $("expBtn").textContent="Select it"; }
+  setTimeout(function(){$("expBtn").textContent="Copy";},1600);
+};
+$("impBtn").onclick=async function(){
+  try{ var o=JSON.parse($("backup").value.trim()); if(!o.register) throw 0;
+    D=o; await save(); render(); $("impBtn").textContent="Loaded"; }
+  catch(e){ $("impBtn").textContent="Not readable"; }
+  setTimeout(function(){$("impBtn").textContent="Load";},1800);
+};
+
+(async function(){ await load(); render(); })();
+})();
+</script>
+</body>
+</html>
