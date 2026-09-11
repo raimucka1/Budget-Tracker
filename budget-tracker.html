@@ -290,7 +290,9 @@ function render(){
       '<div class="v '+(cls&&cls!=="total"?cls:'')+'">'+val+'</div>';
     box.appendChild(d);
   }
+  line(p,"Opening balance","in the account at the start",money(openingFor(viewIdx)));
   line(p,"Net pay",f.pay==null?"not entered yet":"",f.pay==null?"—":money(f.pay),"up");
+  if(f.pay!=null) line(p,"In the account now","opening plus pay",money(openingFor(viewIdx)+f.pay),"am");
   line(p,"Child benefit","£"+(D.childBenefitMonthly)+" a month, spread",money(f.cb),"up");
   line(p,"Committed outgoings",D.register.length+" items, "+money(committedMonthly())+" a month",("−"+money(f.committed)));
   line(p,"Food","",("−"+money(f.food)));
