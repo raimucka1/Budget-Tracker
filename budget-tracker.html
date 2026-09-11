@@ -97,7 +97,7 @@ svg{display:block;width:100%;height:120px}
 <section>
   <div class="eyebrow" style="margin-bottom:8px">Enter this period</div>
   <div class="card">
-    <div class="f"><span class="eyebrow">Net pay received</span>
+    <div class="f"><span class="eyebrow">Salary received</span>
       <input type="number" inputmode="decimal" step="0.01" id="inPay" placeholder="0.00"></div>
     <div class="f"><span class="eyebrow">Account balance on payday, before pay lands</span>
       <input type="number" inputmode="decimal" step="0.01" id="inBal" placeholder="0.00"></div>
@@ -290,9 +290,9 @@ function render(){
       '<div class="v '+(cls&&cls!=="total"?cls:'')+'">'+val+'</div>';
     box.appendChild(d);
   }
-  line(p,"Opening balance","in the account at the start",money(openingFor(viewIdx)));
-  line(p,"Net pay",f.pay==null?"not entered yet":"",f.pay==null?"—":money(f.pay),"up");
-  if(f.pay!=null) line(p,"In the account now","opening plus pay",money(openingFor(viewIdx)+f.pay),"am");
+  line(p,"Previous balance","left over from last period",money(openingFor(viewIdx)));
+  line(p,"Salary",f.pay==null?"not entered yet":"",f.pay==null?"—":money(f.pay),"up");
+  if(f.pay!=null) line(p,"Total now","previous balance plus salary",money(openingFor(viewIdx)+f.pay),"am","total");
   line(p,"Child benefit","£"+(D.childBenefitMonthly)+" a month, spread",money(f.cb),"up");
   line(p,"Committed outgoings",D.register.length+" items, "+money(committedMonthly())+" a month",("−"+money(f.committed)));
   line(p,"Food","",("−"+money(f.food)));
