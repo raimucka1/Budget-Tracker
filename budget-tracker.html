@@ -3,12 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Period Tracker</title>
-<link rel="manifest" href='data:application/manifest+json,{"name":"Period Tracker","short_name":"Budget","start_url":"budget-tracker.html","scope":"./","display":"standalone","background_color":"%2314171c","theme_color":"%2314171c","icons":[{"src":"data:image/svg%2Bxml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27%3E%3Crect width=%27192%27 height=%27192%27 fill=%27%2314171c%27/%3E%3Ctext x=%2796%27 y=%27124%27 font-size=%2796%27 font-family=%27sans-serif%27 font-weight=%27700%27 fill=%27%23f0a830%27 text-anchor=%27middle%27%3E%C2%A3%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
+<title>Household Budget</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"Household Budget","short_name":"Budget","start_url":"budget-tracker.html","scope":"./","display":"standalone","background_color":"%2314171c","theme_color":"%2314171c","icons":[{"src":"data:image/svg%2Bxml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27%3E%3Crect width=%27192%27 height=%27192%27 fill=%27%2314171c%27/%3E%3Ctext x=%2796%27 y=%27124%27 font-size=%2796%27 font-family=%27sans-serif%27 font-weight=%27700%27 fill=%27%23f0a830%27 text-anchor=%27middle%27%3E%C2%A3%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
 <meta name="theme-color" content="#14171c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -26,24 +25,20 @@ h1{font-family:'IBM Plex Sans Condensed',sans-serif;font-size:19px;letter-spacin
 section{margin-top:18px}
 .card{background:var(--raised);border:1px solid var(--line);border-radius:10px;padding:15px}
 .up{color:var(--cyan)}.down{color:var(--red)}.am{color:var(--amber)}
-
 header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:14px}
 .nav{display:flex;gap:8px}
 .nav button{background:none;border:1px solid var(--line);color:var(--text);
   width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer}
-
-.hero{text-align:left}
 .hero .lbl{margin-bottom:4px}
 .hero .fig{font-family:'IBM Plex Mono',monospace;font-size:36px;font-weight:500;line-height:1}
 .hero .sub{font-size:12.5px;color:var(--muted);margin-top:8px}
-
-.line{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.line{display:flex;justify-content:space-between;gap:10px;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--line)}
 .line:last-child{border-bottom:none}
 .line.total{border-top:1px solid var(--line);border-bottom:none;margin-top:4px;padding-top:11px;font-weight:500}
 .line .v{font-family:'IBM Plex Mono',monospace;white-space:nowrap}
-.line .t{min-width:0}
+.line .t{min-width:0;flex:1}
 .line .t small{display:block;font-size:11.5px;color:var(--muted)}
-
 input,select{background:#0e1116;border:1px solid var(--line);color:var(--text);
   border-radius:8px;padding:11px;width:100%;font-family:inherit;font-size:15px}
 input:focus,select:focus,button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
@@ -66,7 +61,7 @@ svg{display:block;width:100%;height:120px}
 </head>
 <body>
 
-<h1>Period tracker</h1>
+<h1>Household budget</h1>
 <header>
   <div>
     <div class="eyebrow">Pay period</div>
@@ -81,7 +76,7 @@ svg{display:block;width:100%;height:120px}
 <section class="card hero">
   <div class="eyebrow lbl">Running total</div>
   <div class="fig" id="runFig">£0.00</div>
-  <div class="sub" id="runSub">Ahead or behind, all periods added up.</div>
+  <div class="sub" id="runSub">Everything in, everything out, both accounts.</div>
 </section>
 
 <section>
@@ -99,8 +94,11 @@ svg{display:block;width:100%;height:120px}
   <div class="card">
     <div class="f"><span class="eyebrow">Salary received</span>
       <input type="number" inputmode="decimal" step="0.01" id="inPay" placeholder="0.00"></div>
-    <div class="f"><span class="eyebrow">Account balance on payday, before pay lands</span>
-      <input type="number" inputmode="decimal" step="0.01" id="inBal" placeholder="0.00"></div>
+    <p class="hint">Both balances on payday, before pay lands.</p>
+    <div class="f"><span class="eyebrow" id="lblA">Main account</span>
+      <input type="number" inputmode="decimal" step="0.01" id="inA" placeholder="0.00"></div>
+    <div class="f"><span class="eyebrow" id="lblB">Second account</span>
+      <input type="number" inputmode="decimal" step="0.01" id="inB" placeholder="0.00"></div>
     <button class="btn" id="saveBtn">Save period</button>
   </div>
 </section>
@@ -117,10 +115,11 @@ svg{display:block;width:100%;height:120px}
 
 <section>
   <details>
-    <summary><span class="eyebrow">Committed outgoings</span></summary>
-    <div class="card" id="regBox" style="margin-top:8px"></div>
+    <summary><span class="eyebrow">Household outgoings</span></summary>
+    <p class="hint" style="margin-top:8px">Everything the household pays, from either account. Transfers between your own accounts are not outgoings.</p>
+    <div class="card" id="regBox"></div>
     <div class="card" style="margin-top:8px">
-      <div class="f"><span class="eyebrow">Add a commitment</span>
+      <div class="f"><span class="eyebrow">Add an outgoing</span>
         <input id="cName" placeholder="Name, e.g. Anglian Water"></div>
       <div class="row" style="margin-bottom:11px">
         <input id="cAmt" type="number" inputmode="decimal" step="0.01" placeholder="Amount">
@@ -129,6 +128,7 @@ svg{display:block;width:100%;height:120px}
       <div class="row" style="margin-bottom:11px">
         <select id="cFreq">
           <option value="monthly">Monthly</option>
+          <option value="weekly">Weekly</option>
           <option value="quarterly">Quarterly</option>
           <option value="annual">Annual</option>
         </select>
@@ -144,14 +144,18 @@ svg{display:block;width:100%;height:120px}
   <details>
     <summary><span class="eyebrow">Settings</span></summary>
     <div class="card" style="margin-top:8px">
+      <div class="f"><span class="eyebrow">Main account name</span><input id="setNameA"></div>
+      <div class="f"><span class="eyebrow">Second account name</span><input id="setNameB"></div>
       <div class="f"><span class="eyebrow">Food per period</span>
         <input type="number" step="0.01" id="setFood"></div>
       <div class="f"><span class="eyebrow">Child benefit per month</span>
         <input type="number" step="0.01" id="setCB"></div>
-      <div class="f"><span class="eyebrow">Lumpy costs per year (car, Christmas, supplements)</span>
+      <div class="f"><span class="eyebrow">Lumpy costs per year (car, Christmas)</span>
         <input type="number" step="0.01" id="setLumpy"></div>
-      <div class="f"><span class="eyebrow">Starting account balance</span>
-        <input type="number" step="0.01" id="setStart"></div>
+      <div class="f"><span class="eyebrow">Starting balance — main</span>
+        <input type="number" step="0.01" id="setStartA"></div>
+      <div class="f"><span class="eyebrow">Starting balance — second</span>
+        <input type="number" step="0.01" id="setStartB"></div>
       <button class="btn ghost" id="saveSet">Save settings</button>
     </div>
   </details>
@@ -170,17 +174,38 @@ svg{display:block;width:100%;height:120px}
 <script>
 (function(){
 "use strict";
-var KEY="periodtracker:v1", mem=null;
+var KEY="household:v1", mem=null;
 
 var DEFAULT={
   anchor:"2026-09-11", cycle:28, payPerYear:13,
-  startBalance:0, foodPerPeriod:0, childBenefitMonthly:0, lumpyPerYear:0,
+  nameA:"Lloyds Club", nameB:"Wife's account",
+  startA:0, startB:0,
+  foodPerPeriod:1200, childBenefitMonthly:108.20, lumpyPerYear:1300,
   register:[
+    {n:"NatWest mortgage",a:1023.54,d:20,f:"monthly",e:true},
+    {n:"Lloyds bank loan",a:192.15,d:3,f:"monthly",e:true},
+    {n:"Tutor (Loras)",a:30,d:7,f:"weekly",e:true},
+    {n:"Peterborough CC council tax",a:127.00,d:25,f:"monthly",e:true},
+    {n:"School (Braybrook)",a:127.00,d:21,f:"monthly",e:true},
+    {n:"Vodafone",a:54.55,d:21,f:"monthly",e:true},
+    {n:"Fuse Energy",a:49.56,d:7,f:"monthly",e:true},
+    {n:"Quote Me Happy — car",a:37.05,d:5,f:"monthly",e:true},
+    {n:"Omega 3",a:34.18,d:1,f:"monthly",e:false},
+    {n:"Anglian Water",a:34.17,d:22,f:"monthly",e:true},
+    {n:"Aviva Life",a:33.33,d:3,f:"monthly",e:true},
+    {n:"MoreThan home insurance",a:23.87,d:6,f:"monthly",e:true},
+    {n:"Community Fibre",a:20.00,d:7,f:"monthly",e:true},
+    {n:"HL index fund ISA",a:40.00,d:7,f:"monthly",e:false},
+    {n:"TV licence",a:44.87,d:15,f:"quarterly",e:true},
+    {n:"Claude",a:18.00,d:1,f:"monthly",e:false},
+    {n:"Tesco Mobile",a:10.00,d:17,f:"monthly",e:true},
+    {n:"D&G AO care plan",a:6.11,d:3,f:"monthly",e:false},
+    {n:"Child's sim top up",a:5.00,d:8,f:"monthly",e:true}
   ],
-  periods:{}   // "P-YYYY-MM-DD" -> {pay, balance}
+  periods:{}   // id -> {pay, balA, balB}
 };
 var D=JSON.parse(JSON.stringify(DEFAULT));
-var viewIdx=0;   // 0 = current period
+var viewIdx=0;
 
 var gbp=new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'});
 function money(n){return gbp.format(n||0);}
@@ -201,75 +226,76 @@ async function load(){
 }
 async function save(){ mem=D; try{ localStorage.setItem(KEY,JSON.stringify(D)); }catch(e){} }
 
-/* ---- period maths ---- */
 function currentStart(){
   var a=parse(D.anchor), t=dOnly(new Date());
   var k=Math.floor((t-a)/86400000/D.cycle);
   var s=new Date(a); s.setDate(a.getDate()+k*D.cycle);
   return s;
 }
-function periodStart(offset){
-  var s=currentStart(); s.setDate(s.getDate()+offset*D.cycle); return s;
-}
+function periodStart(o){ var s=currentStart(); s.setDate(s.getDate()+o*D.cycle); return s; }
 function pid(d){ return "P-"+iso(d); }
-
-/* monthly figure -> per period (12 months spread over 13 paydays) */
 function toPeriod(monthly){ return monthly*12/D.payPerYear; }
 
-function monthlyEquiv(item){
-  if(item.f==="quarterly") return item.a*4/12;
-  if(item.f==="annual") return item.a/12;
-  return item.a;
+function monthlyEquiv(i){
+  if(i.f==="quarterly") return i.a*4/12;
+  if(i.f==="annual")    return i.a/12;
+  if(i.f==="weekly")    return i.a*52/12;
+  return i.a;
 }
 function committedMonthly(){
   return D.register.reduce(function(s,i){return s+monthlyEquiv(i);},0);
 }
-function figures(offset){
-  var s=periodStart(offset), e=new Date(s); e.setDate(s.getDate()+D.cycle-1);
+
+function figures(o){
+  var s=periodStart(o), e=new Date(s); e.setDate(s.getDate()+D.cycle-1);
   var id=pid(s), rec=D.periods[id]||{};
-  var committed = toPeriod(committedMonthly());
-  var food = Number(D.foodPerPeriod)||0;
-  var cb = toPeriod(Number(D.childBenefitMonthly)||0);
-  var sink = (Number(D.lumpyPerYear)||0)/D.payPerYear;
-  var pay = rec.pay!=null ? Number(rec.pay) : null;
-  var plannedIn = (pay||0)+cb;
-  var plannedOut = committed+food;
-  var planLeft = plannedIn-plannedOut-sink;
+  var committed=toPeriod(committedMonthly());
+  var food=Number(D.foodPerPeriod)||0;
+  var cb=toPeriod(Number(D.childBenefitMonthly)||0);
+  var sink=(Number(D.lumpyPerYear)||0)/D.payPerYear;
+  var pay=rec.pay!=null?Number(rec.pay):null;
+  var plannedIn=(pay||0)+cb;
+  var plannedOut=committed+food;
   return {start:s,end:e,id:id,rec:rec,committed:committed,food:food,cb:cb,sink:sink,
-          pay:pay,plannedIn:plannedIn,plannedOut:plannedOut,planLeft:planLeft};
+          pay:pay,plannedIn:plannedIn,plannedOut:plannedOut,
+          planLeft:plannedIn-plannedOut-sink};
 }
 
-/* actual: money that left the account = in − (closing − opening) */
-function openingFor(offset){
-  var i=offset-1, guard=0;
+function hasBalances(rec){ return rec && rec.balA!=null && rec.balB!=null; }
+function combined(rec){ return (Number(rec.balA)||0)+(Number(rec.balB)||0); }
+
+function openingFor(o){
+  var i=o-1, guard=0;
   while(guard++<200){
     var f=figures(i);
-    if(f.rec.balance!=null) return Number(f.rec.balance);
-    i--;
-    if(i<-60) break;
+    if(hasBalances(f.rec)) return combined(f.rec);
+    i--; if(i<-60) break;
   }
-  return Number(D.startBalance)||0;
+  return (Number(D.startA)||0)+(Number(D.startB)||0);
 }
-function actuals(offset){
-  var f=figures(offset);
-  if(f.rec.balance==null||f.pay==null) return null;
-  var opening=openingFor(offset);
-  var closing=Number(f.rec.balance);
+function actuals(o){
+  var f=figures(o);
+  if(!hasBalances(f.rec)||f.pay==null) return null;
+  var opening=openingFor(o), closing=combined(f.rec);
   var change=closing-opening;
   var out=f.plannedIn-change;
   return {opening:opening,closing:closing,change:change,out:out,
-          variance:out-f.plannedOut, leftover:change};
+          variance:out-f.plannedOut,leftover:change};
 }
 function runningTotal(){
-  var total=0, count=0;
-  for(var k=-60;k<=1;k++){
-    var a=actuals(k);
-    if(a){ total+=a.leftover; count++; }
-  }
+  var total=0,count=0;
+  for(var k=-60;k<=1;k++){ var a=actuals(k); if(a){ total+=a.leftover; count++; } }
   return {total:total,count:count};
 }
 
-/* ---- render ---- */
+function line(box,label,sub,val,cls,tag){
+  var d=document.createElement("div"); d.className="line"+(cls==="total"?" total":"");
+  d.innerHTML='<div class="t">'+esc(label)+(tag?'<span class="tag">'+esc(tag)+'</span>':'')+
+    (sub?'<small>'+esc(sub)+'</small>':'')+'</div>'+
+    '<div class="v '+(cls&&cls!=="total"?cls:'')+'">'+val+'</div>';
+  box.appendChild(d);
+}
+
 function render(){
   var f=figures(viewIdx);
   $("periodLabel").textContent=fmt(f.start)+" – "+fmt(f.end);
@@ -281,64 +307,55 @@ function render(){
     ? "Nothing logged yet. Enter your first period below."
     : rt.count+(rt.count===1?" period":" periods")+" logged. Average "+signed(rt.total/rt.count)+" per period.";
 
-  /* plan */
   var p=$("planBox"); p.innerHTML="";
-  function line(box,label,sub,val,cls,tag){
-    var d=document.createElement("div"); d.className="line"+(cls==="total"?" total":"");
-    d.innerHTML='<div class="t">'+esc(label)+(tag?'<span class="tag">'+esc(tag)+'</span>':'')+
-      (sub?'<small>'+esc(sub)+'</small>':'')+'</div>'+
-      '<div class="v '+(cls&&cls!=="total"?cls:'')+'">'+val+'</div>';
-    box.appendChild(d);
-  }
-  line(p,"Previous balance","left over from last period",money(openingFor(viewIdx)));
+  line(p,"Money in both accounts","carried over from last period",money(openingFor(viewIdx)));
   line(p,"Salary",f.pay==null?"not entered yet":"",f.pay==null?"—":money(f.pay),"up");
-  if(f.pay!=null) line(p,"Total now","previous balance plus salary",money(openingFor(viewIdx)+f.pay),"am","total");
-  line(p,"Child benefit","£"+(D.childBenefitMonthly)+" a month, spread",money(f.cb),"up");
-  line(p,"Committed outgoings",D.register.length+" items, "+money(committedMonthly())+" a month",("−"+money(f.committed)));
-  line(p,"Food","",("−"+money(f.food)));
-  line(p,"Set aside","£"+D.lumpyPerYear+" a year of lumpy costs",("−"+money(f.sink)));
+  line(p,"Child benefit","£"+D.childBenefitMonthly+" a month, spread",money(f.cb),"up");
+  if(f.pay!=null)
+    line(p,"Total now","carried over plus money in",money(openingFor(viewIdx)+f.plannedIn),"am","total");
+  line(p,"Household outgoings",D.register.length+" items, "+money(committedMonthly())+" a month","−"+money(f.committed));
+  line(p,"Food","","−"+money(f.food));
+  line(p,"Set aside","£"+D.lumpyPerYear+" a year of lumpy costs","−"+money(f.sink));
   line(p,"Left to live on","after everything above",
     f.pay==null?"—":money(f.planLeft), f.planLeft>=0?"up":"down","total");
 
-  /* actual */
   var a=actuals(viewIdx), ab=$("actualBox"); ab.innerHTML="";
   if(!a){
-    ab.innerHTML='<div class="hint" style="margin:0">Enter your net pay and the account balance on payday and this fills in. Spending is worked out from the balance — no receipts needed.</div>';
+    ab.innerHTML='<div class="hint" style="margin:0">Enter your salary and both balances on payday and this fills in. Spending is worked out from the balances — no receipts needed.</div>';
   } else {
-    line(ab,"Opening balance","",money(a.opening));
-    line(ab,"Closing balance","",money(a.closing));
-    line(ab,"Everything that left the account","bills, food, fuel, all of it",("−"+money(a.out)));
+    line(ab,"Both accounts at the start","",money(a.opening));
+    line(ab,"Both accounts at the end","",money(a.closing));
+    line(ab,"Everything the household spent","bills, food, fuel, all of it","−"+money(a.out));
     line(ab,"Against plan",a.variance>0?"more went out than planned":"less went out than planned",
       signed(-a.variance), a.variance<=0?"up":"down");
-    line(ab,"Leftover this period","change in your balance",
+    line(ab,"Up or down this period","change across both accounts",
       signed(a.leftover), a.leftover>=0?"up":"down","total");
   }
 
-  /* sinking */
   var sb=$("sinkBox"); sb.innerHTML="";
-  var pot=rt.count*f.sink;
-  line(sb,"Car maintenance, Christmas, supplements","£"+D.lumpyPerYear+" a year",money(f.sink)+" / period");
-  line(sb,"Built up so far",rt.count+" periods",money(pot),"am","total");
+  line(sb,"Car maintenance, Christmas","£"+D.lumpyPerYear+" a year",money(f.sink)+" / period");
+  line(sb,"Built up so far",rt.count+" periods",money(rt.count*f.sink),"am","total");
 
-  /* register */
   var rb=$("regBox"); rb.innerHTML="";
   if(!D.register.length){
-    rb.innerHTML='<div class="hint" style="margin:0">Nothing here yet. Add your standing orders and direct debits below, or paste a backup.</div>';
+    rb.innerHTML='<div class="hint" style="margin:0">Nothing here yet. Add your outgoings below, or paste a backup.</div>';
   } else {
     D.register.slice().sort(function(x,y){return monthlyEquiv(y)-monthlyEquiv(x);}).forEach(function(i){
       var idx=D.register.indexOf(i);
       var row=document.createElement("div"); row.className="line";
       var t=document.createElement("div"); t.className="t";
-      t.innerHTML=esc(i.n)+'<small>'+(i.f==="monthly"?"day "+i.d:esc(i.f)+", day "+i.d)+(i.e?"":" \u00b7 not essential")+'</small>';
+      var freq=i.f==="monthly"?("day "+i.d):(i.f+", day "+i.d);
+      var eq=i.f!=="monthly"?(" · "+money(monthlyEquiv(i))+"/mo"):"";
+      t.innerHTML=esc(i.n)+'<small>'+esc(freq)+eq+(i.e?"":" · not essential")+'</small>';
       row.appendChild(t);
       var inp=document.createElement("input");
       inp.type="number"; inp.step="0.01"; inp.value=i.a;
-      inp.style.maxWidth="96px"; inp.style.padding="7px";
+      inp.style.maxWidth="92px"; inp.style.padding="7px";
       inp.setAttribute("aria-label","Amount for "+i.n);
       inp.onchange=async function(){ D.register[idx].a=Number(inp.value)||0; await save(); render(); };
       row.appendChild(inp);
       var x=document.createElement("button");
-      x.className="btn ghost"; x.textContent="\u00d7";
+      x.className="btn ghost"; x.textContent="×";
       x.style.maxWidth="38px"; x.style.padding="7px"; x.style.marginLeft="6px";
       x.setAttribute("aria-label","Remove "+i.n);
       x.onclick=async function(){ D.register.splice(idx,1); await save(); render(); };
@@ -348,23 +365,23 @@ function render(){
     line(rb,"Monthly total","across "+D.register.length+" items",money(committedMonthly()),"am","total");
   }
 
-  /* inputs */
-  $("inPay").value = f.rec.pay!=null?f.rec.pay:"";
-  $("inBal").value = f.rec.balance!=null?f.rec.balance:"";
+  $("lblA").textContent=D.nameA;
+  $("lblB").textContent=D.nameB;
+  $("inPay").value=f.rec.pay!=null?f.rec.pay:"";
+  $("inA").value=f.rec.balA!=null?f.rec.balA:"";
+  $("inB").value=f.rec.balB!=null?f.rec.balB:"";
+  $("setNameA").value=D.nameA; $("setNameB").value=D.nameB;
   $("setFood").value=D.foodPerPeriod;
   $("setCB").value=D.childBenefitMonthly;
   $("setLumpy").value=D.lumpyPerYear;
-  $("setStart").value=D.startBalance;
+  $("setStartA").value=D.startA; $("setStartB").value=D.startB;
 
   drawChart();
 }
 
 function drawChart(){
   var pts=[],run=0;
-  for(var k=-60;k<=1;k++){
-    var a=actuals(k);
-    if(a){ run+=a.leftover; pts.push(run); }
-  }
+  for(var k=-60;k<=1;k++){ var a=actuals(k); if(a){ run+=a.leftover; pts.push(run); } }
   var w=$("chartWrap");
   if(pts.length<2){ w.hidden=true; return; }
   w.hidden=false;
@@ -378,20 +395,19 @@ function drawChart(){
     d+=(i?" L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1);
     c+='<circle cx="'+x(i).toFixed(1)+'" cy="'+y(v).toFixed(1)+'" r="3" fill="var(--amber)"/>';
   });
-  var z='<line x1="'+P+'" x2="'+(W-P)+'" y1="'+y(0).toFixed(1)+'" y2="'+y(0).toFixed(1)+
-        '" stroke="var(--line)" stroke-width="1"/>';
-  $("chart").innerHTML=z+'<path d="'+d+'" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linejoin="round"/>'+c;
+  $("chart").innerHTML='<line x1="'+P+'" x2="'+(W-P)+'" y1="'+y(0).toFixed(1)+'" y2="'+y(0).toFixed(1)+
+    '" stroke="var(--line)" stroke-width="1"/><path d="'+d+
+    '" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linejoin="round"/>'+c;
 }
 
-/* ---- actions ---- */
 $("prev").onclick=function(){viewIdx--;render();};
 $("next").onclick=function(){viewIdx++;render();};
 
 $("saveBtn").onclick=async function(){
-  var f=figures(viewIdx);
-  var rec=D.periods[f.id]||{};
+  var f=figures(viewIdx), rec=D.periods[f.id]||{};
   if($("inPay").value!=="") rec.pay=Number($("inPay").value);
-  if($("inBal").value!=="") rec.balance=Number($("inBal").value);
+  if($("inA").value!=="") rec.balA=Number($("inA").value);
+  if($("inB").value!=="") rec.balB=Number($("inB").value);
   D.periods[f.id]=rec;
   await save(); render();
   $("saveBtn").textContent="Saved";
@@ -408,10 +424,13 @@ $("cAdd").onclick=async function(){
 };
 
 $("saveSet").onclick=async function(){
+  D.nameA=$("setNameA").value.trim()||"Main account";
+  D.nameB=$("setNameB").value.trim()||"Second account";
   D.foodPerPeriod=Number($("setFood").value)||0;
   D.childBenefitMonthly=Number($("setCB").value)||0;
   D.lumpyPerYear=Number($("setLumpy").value)||0;
-  D.startBalance=Number($("setStart").value)||0;
+  D.startA=Number($("setStartA").value)||0;
+  D.startB=Number($("setStartB").value)||0;
   await save(); render();
   $("saveSet").textContent="Saved";
   setTimeout(function(){$("saveSet").textContent="Save settings";},1400);
